@@ -9,10 +9,9 @@ from std_msgs.msg import Int16
 class GeneralControl(Node):
 
     def __init__(self):
-        super().__init__('reel_controller')
+        super().__init__('reel_winder_ctrl')
         self.publisher_   = self.create_publisher(Twist, 'cmd_vel', 10)
         self.subscription = self.create_subscription(Int16, 'reel_cmd', self.listener_cb,1)
-
         self.ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
         self.ser.reset_input_buffer()
                 

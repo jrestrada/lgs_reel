@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'reel_node = lgs_reel.reel_node:main'
+            'reel_winder_ctrl = lgs_reel.reel_and_winder_control:main'
         ],
     },
 )
