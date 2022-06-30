@@ -14,16 +14,18 @@ class GeneralControl(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
         self.ser.reset_input_buffer()
-
-    def timer_callback(self):
-        msg = Twist()
-        msg.linear.x = 1.0
         print("select number of seconds")
-        flashes = int(input())
+        self.t_units = int(input())
+        
+    def timer_callback(self):
+        # t_units = int(input())
+        msg = Twist()
+        msg.linear.x = float(self.t_units)
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.linear.x)
-        flashes.to_bytes(2, byteorder='big')
-        self.ser.write(flashes)
+        t_units_abs = abs(self.t_units)
+        t_units_abs.to_bytes(2, byteorder='big')
+        self.ser.write(t_units_abs)
         self.ser.write(b"\n")
 
 def main(args=None):
