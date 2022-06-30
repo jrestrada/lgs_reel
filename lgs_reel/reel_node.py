@@ -4,26 +4,25 @@ import time
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist 
+from std_msgs.msg import Int16
 
 class GeneralControl(Node):
 
     def __init__(self):
         super().__init__('reel_controller')
-        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
-        timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.publisher_   = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.subscription = self.create_subscription(Int16, 'reel_cmd', self.listener_cb,1)
+
         self.ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
         self.ser.reset_input_buffer()
-        print("select number of seconds")
-        self.t_units = int(input())
-        
-    def timer_callback(self):
-        # t_units = int(input())
-        msg = Twist()
-        msg.linear.x = float(self.t_units)
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.linear.x)
-        t_units_abs = abs(self.t_units)
+                
+    def listener_cb(self, msg):
+        self.get_logger().info('Processing reel_cmd "%s"' % msg.data)
+        cmd_vel_msg = Twist()
+        cmd_vel_msg.linear.x = float(msg.data)
+        self.publisher_.publish(cmd_vel_msg)
+        self.get_logger().info('Publishing: "%s"' % cmd_vel_msg.linear.x)
+        t_units_abs = abs(msg.data)
         t_units_abs.to_bytes(2, byteorder='big')
         self.ser.write(t_units_abs)
         self.ser.write(b"\n")
